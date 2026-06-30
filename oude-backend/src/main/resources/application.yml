@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: oude-backend
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}/${DB_NAME:oude_db}
+    username: ${DB_USER:oude_dev}
+    password: ${DB_PASSWORD:dev_only}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  config: classpath:logback-spring.xml

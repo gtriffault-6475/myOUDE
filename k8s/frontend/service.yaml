@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: oude-frontend-svc
+  namespace: oude
+spec:
+  selector:
+    app: oude-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer   # Exposé externalement pour accès vendeur

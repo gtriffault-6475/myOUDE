@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oude-frontend
+  namespace: oude
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oude-frontend
+  template:
+    metadata:
+      labels:
+        app: oude-frontend
+    spec:
+      containers:
+        - name: oude-frontend
+          image: REGION-docker.pkg.dev/PROJECT_ID/oude/frontend:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -1,0 +1,27 @@
+# Node / Angular
+node_modules/
+dist/
+.angular/
+*.env
+
+# Java / Maven
+target/
+*.jar
+*.class
+.mvn/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — jamais en git
+**/application-local.yml
+**/application-secrets.yml
+*.key
+*.p12
+service-account*.json

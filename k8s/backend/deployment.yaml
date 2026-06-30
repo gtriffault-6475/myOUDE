@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oude-backend
+  namespace: oude
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oude-backend
+  template:
+    metadata:
+      labels:
+        app: oude-backend
+    spec:
+      serviceAccountName: oude-backend-sa   # Workload Identity → GSA
+      containers:
+        - name: oude-backend
+          image: REGION-docker.pkg.dev/PROJECT_ID/oude/backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: "127.0.0.1"             # Cloud SQL Auth Proxy sidecar
+            - name: DB_NAME
+              value: "oude_db"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "gke"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+        # Cloud SQL Auth Proxy — sidecar (Workload Identity, pas de mot de passe)
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.11
+          args:
+            - "--private-ip"
+            - "PROJECT_ID:REGION:oude-db"    # À remplacer par les valeurs réelles
+          securityContext:
+            runAsNonRoot: true

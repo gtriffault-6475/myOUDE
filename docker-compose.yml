@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: oude_db
+      POSTGRES_USER: oude_dev
+      POSTGRES_PASSWORD: dev_only_not_prod
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./oude-backend
+    environment:
+      DB_HOST: db
+      DB_NAME: oude_db
+      DB_USER: oude_dev
+      DB_PASSWORD: dev_only_not_prod
+      SPRING_PROFILES_ACTIVE: local
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./oude-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
