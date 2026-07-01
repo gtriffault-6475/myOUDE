@@ -1,1 +1,60 @@
-/* You can add global styles to this file, and also import other style files */
+// Angular Material theme — OUDE
+@use '@angular/material' as mat;
+
+// Palette primaire : bleu Renault #1A3EAD
+$oude-primary: mat.m2-define-palette(mat.$m2-indigo-palette, 800);
+// Palette accent : vert Renault #00BF6F
+$oude-accent: mat.m2-define-palette(mat.$m2-green-palette, A400);
+// Warn : rouge standard
+$oude-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$oude-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $oude-primary,
+    accent:  $oude-accent,
+    warn:    $oude-warn,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($oude-theme);
+
+// Tokens CSS globaux OUDE (depuis DESIGN.md)
+:root {
+  --color-bg-page:      #EFF7EE;
+  --color-bg-card:      #FFFFFF;
+  --color-bg-sidebar:   #FFFFFF;
+  --color-bg-askrg:     #FFF5EC;
+
+  --color-brand-blue:   #1A3EAD;
+  --color-brand-dark:   #1A1F2E;
+  --color-brand-green:  #00BF6F;
+
+  --color-score-hot:    #00C853;
+  --color-score-warm:   #FF9800;
+  --color-score-cold:   #90A4AE;
+
+  --color-text-primary:   #1A1F2E;
+  --color-text-secondary: #5F6B7A;
+  --color-text-muted:     #9EAAB4;
+
+  --color-border:         #E0EAE0;
+
+  --sidebar-width:        64px;
+  --border-radius-card:   12px;
+  --border-radius-pill:   9999px;
+}
+
+// Reset de base
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Renault', 'Inter', system-ui, sans-serif;
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+}

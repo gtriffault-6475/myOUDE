@@ -1,0 +1,135 @@
+name: CI — Build, Test, Push & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  # TODO: AQ-5 — Remplacer par les valeurs réelles Renault
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: ${{ secrets.GCP_REGION }}
+  GKE_CLUSTER: ${{ secrets.GKE_CLUSTER }}
+  ARTIFACT_REGISTRY: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/oude
+  IMAGE_BACKEND: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/oude/backend
+  IMAGE_FRONTEND: ${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/oude/frontend
+
+jobs:
+  # ─── Backend : tests + build image ───────────────────────────────────────
+  backend:
+    name: Backend — Test & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: oude-backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run tests
+        run: mvn test -Dspring.profiles.active=test
+
+      - name: Build JAR
+        run: mvn package -DskipTests -q
+
+      - name: Authenticate to GCP
+        if: github.ref == 'refs/heads/main'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        if: github.ref == 'refs/heads/main'
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build & push backend image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -t ${{ env.IMAGE_BACKEND }}:${{ github.sha }} .
+          docker push ${{ env.IMAGE_BACKEND }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE_BACKEND }}:${{ github.sha }} ${{ env.IMAGE_BACKEND }}:latest
+          docker push ${{ env.IMAGE_BACKEND }}:latest
+
+  # ─── Frontend : lint + build image ───────────────────────────────────────
+  frontend:
+    name: Frontend — Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: oude-frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: oude-frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular (production)
+        run: npm run build -- --configuration production
+
+      - name: Authenticate to GCP
+        if: github.ref == 'refs/heads/main'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Configure Docker for Artifact Registry
+        if: github.ref == 'refs/heads/main'
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build & push frontend image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -t ${{ env.IMAGE_FRONTEND }}:${{ github.sha }} .
+          docker push ${{ env.IMAGE_FRONTEND }}:${{ github.sha }}
+          docker tag ${{ env.IMAGE_FRONTEND }}:${{ github.sha }} ${{ env.IMAGE_FRONTEND }}:latest
+          docker push ${{ env.IMAGE_FRONTEND }}:latest
+
+  # ─── Deploy sur GKE (main uniquement) ────────────────────────────────────
+  deploy:
+    name: Deploy to GKE
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Get GKE credentials
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GCP_REGION }}
+
+      - name: Apply K8s manifests
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          # Injecter le SHA du commit dans les images
+          sed -i "s|:latest|:${{ github.sha }}|g" k8s/backend/deployment.yaml k8s/frontend/deployment.yaml
+          kubectl apply -f k8s/backend/
+          kubectl apply -f k8s/frontend/
+
+      - name: Vérifier le déploiement
+        run: |
+          kubectl rollout status deployment/oude-backend -n oude --timeout=120s
+          kubectl rollout status deployment/oude-frontend -n oude --timeout=120s

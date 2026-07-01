@@ -1,0 +1,13 @@
+# Copier ce fichier en application-local.yml (gitignored) pour le dev local
+# Ce fichier est un template — ne pas mettre de vrais secrets ici
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}/${DB_NAME:oude_db}
+    username: ${DB_USER:oude_dev}
+    password: ${DB_PASSWORD:dev_only}
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    com.renault.oude: DEBUG
