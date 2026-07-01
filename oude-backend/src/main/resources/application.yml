@@ -12,6 +12,15 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # TODO: AQ-1 — JWKS_URI : remplacer par l'URL réelle de l'IdP Renault
+          # Ex: https://sso.renault.com/.well-known/jwks.json
+          jwks-uri: ${SSO_JWKS_URI:http://localhost:9090/jwks}
+          # TODO: AQ-1 : issuer à confirmer avec l'équipe sécurité Renault
+          issuer-uri: ${SSO_ISSUER_URI:http://localhost:9090}
 
 management:
   endpoints:

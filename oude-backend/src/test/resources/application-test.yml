@@ -1,4 +1,4 @@
-# Profil test — H2 en mémoire (pas de PostgreSQL requis)
+# Profil test — H2 en mémoire, JwtDecoder mocké (pas de PostgreSQL ni d'IdP requis)
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
@@ -11,3 +11,10 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Valeur bidon — le JwtDecoder est mocké dans les tests @SpringBootTest
+          jwks-uri: http://localhost:9090/jwks
+          issuer-uri: http://localhost:9090

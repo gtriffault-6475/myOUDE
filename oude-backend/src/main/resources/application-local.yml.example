@@ -7,7 +7,23 @@ spring:
     password: ${DB_PASSWORD:dev_only}
   jpa:
     show-sql: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Mock SSO local — WireMock ou mock embarqué
+          jwks-uri: http://localhost:9090/jwks
+          issuer-uri: http://localhost:9090
+
+# Identité mock du vendeur (configurable pour tester différents portefeuilles)
+oude:
+  mock:
+    vendeur-id: "VEND-001"
+    prenom: "Natasha"
+    email: "natasha.martin@renault.com"
+    portefeuille-id: "PF-BOULOGNE-001"
 
 logging:
   level:
     com.renault.oude: DEBUG
+    org.springframework.security: DEBUG
