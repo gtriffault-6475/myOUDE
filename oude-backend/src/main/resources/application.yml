@@ -31,5 +31,20 @@ management:
     health:
       show-details: always
 
+renault:
+  api:
+    leads-url: ${RENAULT_API_LEADS_URL:stub}      # TODO: AQ-2 — URL Apigee X leads
+    affaires-url: ${RENAULT_API_AFFAIRES_URL:stub} # TODO: AQ-3 — URL Apigee X affaires
+
+resilience4j:
+  retry:
+    instances:
+      renaultApi:
+        max-attempts: 2
+        wait-duration: 500ms
+        retry-exceptions:
+          - java.io.IOException
+          - org.springframework.web.client.ResourceAccessException
+
 logging:
   config: classpath:logback-spring.xml

@@ -84,6 +84,11 @@
       <artifactId>resilience4j-spring-boot3</artifactId>
       <version>2.2.0</version>
     </dependency>
+    <!-- AOP requis pour les annotations Resilience4j (@Retry, @CircuitBreaker) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
 
     <!-- Tests -->
     <dependency>

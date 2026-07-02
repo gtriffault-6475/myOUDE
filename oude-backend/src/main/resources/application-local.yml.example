@@ -23,6 +23,12 @@ oude:
     email: "natasha.martin@renault.com"
     portefeuille-id: "PF-BOULOGNE-001"
 
+# APIs Renault — en local, les stubs sont utilisés automatiquement (valeur "stub")
+renault:
+  api:
+    leads-url: stub      # TODO: AQ-2 — remplacer par l'URL Apigee X réelle
+    affaires-url: stub   # TODO: AQ-3 — remplacer par l'URL Apigee X réelle
+
 logging:
   level:
     com.renault.oude: DEBUG
