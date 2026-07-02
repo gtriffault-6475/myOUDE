@@ -1,0 +1,96 @@
+# generated: 2026-06-30
+# last_updated: 2026-07-01
+# project: OUDE
+# project_key: SCRUM
+# tracking_system: file-system + JIRA (gtriffault.atlassian.net)
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; sprint-status surfaces open ones
+#
+# JIRA MAPPING:
+# =============
+# Epics:   SCRUM-5 (E1), SCRUM-6 (E2), SCRUM-7 (E3), SCRUM-8 (E4), SCRUM-9 (E5), SCRUM-10 (E6)
+# Stories: SCRUM-11 à SCRUM-33
+
+generated: 2026-06-30
+last_updated: 2026-07-01
+project: OUDE
+project_key: SCRUM
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # ── Epic 1 : Accès sécurisé à l'application (SSO + fondations) ──────────── SCRUM-5
+  epic-1: in-progress
+  1-1-bootstrap-projet-angular-spring-boot-postgresql-gke: in-progress  # SCRUM-11
+  1-2-integration-sso-renault-authentification-et-extraction-identite: review  # SCRUM-12
+  1-3-navigation-shell-layout-principal-et-routing-angular: backlog       # SCRUM-13
+  epic-1-retrospective: optional
+
+  # ── Epic 2 : Homepage — vue portefeuille du vendeur ─────────────────────── SCRUM-6
+  epic-2: in-progress
+  2-1-chargement-et-stockage-portefeuille-vendeur-apis-renault: review   # SCRUM-14
+  2-2-moteur-scoring-potentiel-client-regles-metier-back-end: backlog     # SCRUM-15
+  2-3-header-homepage-prenom-vendeur-date-resume-dynamique: backlog       # SCRUM-16
+  2-4-compteurs-priorites-du-jour: backlog                                # SCRUM-17
+  2-5-liste-leads-prioritaires-classes-par-score: backlog                 # SCRUM-18
+  2-6-liste-affaires-en-cours: backlog                                    # SCRUM-19
+  epic-2-retrospective: optional
+
+  # ── Epic 3 : Fiche Client 360° ───────────────────────────────────────────── SCRUM-7
+  epic-3: backlog
+  3-1-chargement-donnees-client-apis-renault-ttl-15min: backlog           # SCRUM-20
+  3-2-header-client-identite-score-potentiel-infobulle: backlog           # SCRUM-21
+  3-3-vehicule-actuel-financement-historique-vehicules: backlog            # SCRUM-22
+  3-4-consentements-pipeline-opportunites-signaux-digitaux: backlog       # SCRUM-23
+  3-5-actions-contact-appel-email-log-automatique: backlog                # SCRUM-24
+  3-6-historique-interactions-client: backlog                             # SCRUM-25
+  epic-3-retrospective: optional
+
+  # ── Epic 4 : Intelligence artificielle ──────────────────────────────────── SCRUM-8
+  epic-4: backlog
+  4-1-integration-vertex-ai-gemini-client-sdk-timeout-fallback: backlog  # SCRUM-26
+  4-2-resume-ia-profil-client-vertex-ai-gemini: backlog                  # SCRUM-27
+  4-3-recommandation-action-ia-avec-ctas-contextuels: backlog            # SCRUM-28
+  epic-4-retrospective: optional
+
+  # ── Epic 5 : Intégration widget AskRG ───────────────────────────────────── SCRUM-9
+  epic-5: backlog
+  5-1-integration-widget-askrg-homepage-et-fiche-client: backlog         # SCRUM-29
+  epic-5-retrospective: optional
+
+  # ── Epic 6 : Module essais véhicules ─────────────────────────────────────── SCRUM-10
+  epic-6: backlog
+  6-1-modele-donnees-seed-flotte-essais-par-concession: backlog           # SCRUM-30
+  6-2-affichage-creneaux-disponibles-par-vehicule: backlog                # SCRUM-31
+  6-3-flux-reservation-essai-depuis-fiche-client: backlog                 # SCRUM-32
+  6-4-confirmation-email-simulee-stub-lot-1: backlog                      # SCRUM-33
+  epic-6-retrospective: optional
