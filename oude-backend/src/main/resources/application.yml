@@ -31,6 +31,11 @@ management:
     health:
       show-details: always
 
+oude:
+  country-code: ${OUDE_COUNTRY_CODE:fr}
+  cache:
+    portfolio-ttl-hours: ${OUDE_CACHE_TTL_HOURS:1}
+
 renault:
   api:
     leads-url: ${RENAULT_API_LEADS_URL:stub}      # TODO: AQ-2 — URL Apigee X leads

@@ -1,28 +1,31 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PortefeuilleService } from './portefeuille.service';
 import { PortefeuilleResponse } from '../models/portefeuille.model';
 
 describe('PortefeuilleService', () => {
   let service: PortefeuilleService;
   let httpMock: HttpTestingController;
+  let translate: TranslateService;
 
   const mockResponse: PortefeuilleResponse = {
     leads: [
       {
-        id: 'LEAD-001', portefeuilleId: 'PF-001', nomClient: 'Dupont',
-        prenomClient: 'Jean', statut: 'NOUVEAU', scorePotentiel: 89,
-        derniereSynchronisation: new Date().toISOString()
+        id: 'LEAD-001', portfolioId: 'PF-001', clientLastName: 'Dupont',
+        clientFirstName: 'Jean', status: 'NEW', potentialScore: 89,
+        lastSyncAt: new Date().toISOString(), countryCode: 'fr'
       }
     ],
     affaires: [],
-    donneesDatees: false,
-    derniereSynchronisation: new Date().toISOString()
+    staleData: false,
+    lastSyncAt: new Date().toISOString()
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [TranslateModule.forRoot()],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting()
@@ -30,6 +33,14 @@ describe('PortefeuilleService', () => {
     });
     service = TestBed.inject(PortefeuilleService);
     httpMock = TestBed.inject(HttpTestingController);
+    translate = TestBed.inject(TranslateService);
+    translate.setTranslation('fr', {
+      PORTFOLIO: {
+        ERROR_STALE: 'Données temporairement indisponibles — affichage du dernier état connu',
+        ERROR_LOAD: 'Erreur lors du chargement du portefeuille'
+      }
+    });
+    translate.use('fr');
   });
 
   afterEach(() => httpMock.verify());
@@ -47,8 +58,8 @@ describe('PortefeuilleService', () => {
 
     expect(service.loading()).toBeFalse();
     expect(service.leads()).toHaveSize(1);
-    expect(service.leads()[0].nomClient).toBe('Dupont');
-    expect(service.donneesDatees()).toBeFalse();
+    expect(service.leads()[0].clientLastName).toBe('Dupont');
+    expect(service.staleData()).toBeFalse();
     expect(service.error()).toBeNull();
   });
 

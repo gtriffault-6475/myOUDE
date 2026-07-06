@@ -1,0 +1,36 @@
+# France — country configuration (Lot 1 reference implementation)
+# All values here are CONFIGURABLE: override per-country without code change.
+
+country:
+  code: fr
+  name: France
+  locale: fr-FR
+  currency: EUR
+  timezone: Europe/Paris
+
+formats:
+  date: dd/MM/yyyy
+  datetime: dd/MM/yyyy HH:mm
+  number_decimal_separator: ","
+  number_thousands_separator: " "
+
+features:
+  lead_scoring: true
+  deal_financing_types:
+    - LLD
+    - LOA
+    - CREDIT
+    - COMPTANT
+
+lead:
+  status_codes:
+    - NEW
+    - IN_PROGRESS
+    - PENDING
+    - COLD
+
+deal:
+  status_codes:
+    - RENEWAL
+    - NEGOTIATION
+    - OFFER

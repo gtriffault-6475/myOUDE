@@ -47,8 +47,8 @@ class PortefeuilleControllerIT {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.leads").isArray())
             .andExpect(jsonPath("$.affaires").isArray())
-            .andExpect(jsonPath("$.donneesDatees").value(false))
-            .andExpect(jsonPath("$.leads[0].nomClient").value("Dupont"));
+            .andExpect(jsonPath("$.staleData").value(false))
+            .andExpect(jsonPath("$.leads[0].clientLastName").value("Dupont"));
     }
 
     @Test

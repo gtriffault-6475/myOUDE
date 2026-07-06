@@ -1,0 +1,44 @@
+{
+  "PORTFOLIO": {
+    "TITLE": "Mon portefeuille",
+    "LEADS_TAB": "Leads",
+    "DEALS_TAB": "Affaires",
+    "ERROR_STALE": "Données temporairement indisponibles — affichage du dernier état connu",
+    "ERROR_LOAD": "Erreur lors du chargement du portefeuille",
+    "LOADING": "Chargement...",
+    "STALE_BANNER": "Données affichées depuis le cache — dernière mise à jour : {{date}}",
+    "EMPTY_LEADS": "Aucun lead pour le moment",
+    "EMPTY_DEALS": "Aucune affaire en cours"
+  },
+  "LEAD": {
+    "STATUS": {
+      "NEW": "Nouveau",
+      "IN_PROGRESS": "En cours",
+      "PENDING": "En attente",
+      "COLD": "Froid"
+    },
+    "SCORE": "Score",
+    "VEHICLE": "Véhicule d'intérêt",
+    "LAST_CONTACT": "Dernier contact"
+  },
+  "DEAL": {
+    "STATUS": {
+      "RENEWAL": "Renouvellement",
+      "NEGOTIATION": "Négociation",
+      "OFFER": "Offre"
+    },
+    "FINANCING": "Financement",
+    "DUE_DATE": "Échéance"
+  },
+  "AUTH": {
+    "LOGIN": "Se connecter",
+    "LOGOUT": "Se déconnecter",
+    "SESSION_EXPIRED": "Votre session a expiré, veuillez vous reconnecter"
+  },
+  "COMMON": {
+    "LOADING": "Chargement en cours...",
+    "ERROR": "Une erreur est survenue",
+    "RETRY": "Réessayer",
+    "BACK": "Retour"
+  }
+}

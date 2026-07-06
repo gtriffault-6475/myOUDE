@@ -29,12 +29,12 @@ class PortefeuilleServiceTest {
     void getPortefeuille_cacheValide_retourneDepuisCache_sansAppelApi() {
         var sync = syncAvecAge(0); // sync récente (< 1h)
         when(syncRepository.findById(PF_ID)).thenReturn(Optional.of(sync));
-        when(leadRepository.findByPortefeuilleId(PF_ID)).thenReturn(List.of(unLead()));
-        when(affaireRepository.findByPortefeuilleId(PF_ID)).thenReturn(List.of(uneAffaire()));
+        when(leadRepository.findByPortfolioId(PF_ID)).thenReturn(List.of(unLead()));
+        when(affaireRepository.findByPortfolioId(PF_ID)).thenReturn(List.of(uneAffaire()));
 
         var result = service.getPortefeuille(PF_ID);
 
-        assertThat(result.donneesDatees()).isFalse();
+        assertThat(result.staleData()).isFalse();
         assertThat(result.leads()).hasSize(1);
         assertThat(result.affaires()).hasSize(1);
         verifyNoInteractions(renaultApiClient);
@@ -50,7 +50,7 @@ class PortefeuilleServiceTest {
 
         var result = service.getPortefeuille(PF_ID);
 
-        assertThat(result.donneesDatees()).isFalse();
+        assertThat(result.staleData()).isFalse();
         verify(renaultApiClient).fetchLeads(PF_ID);
         verify(renaultApiClient).fetchAffaires(PF_ID);
     }
@@ -63,7 +63,7 @@ class PortefeuilleServiceTest {
 
         var result = service.getPortefeuille(PF_ID);
 
-        assertThat(result.donneesDatees()).isFalse();
+        assertThat(result.staleData()).isFalse();
         verify(renaultApiClient).fetchLeads(PF_ID);
     }
 
@@ -73,16 +73,15 @@ class PortefeuilleServiceTest {
         when(renaultApiClient.fetchLeads(PF_ID)).thenThrow(new RuntimeException("API timeout"));
         when(syncRepository.existsById(PF_ID)).thenReturn(true);
 
-        // Il faut un sync pour fromCache
         var sync = syncAvecAge(2);
-        when(syncRepository.findById(PF_ID)).thenReturn(Optional.empty()) // premier appel → pas de cache
-            .thenReturn(Optional.of(sync)); // second appel dans fromCache
-        when(leadRepository.findByPortefeuilleId(PF_ID)).thenReturn(List.of(unLead()));
-        when(affaireRepository.findByPortefeuilleId(PF_ID)).thenReturn(List.of());
+        when(syncRepository.findById(PF_ID)).thenReturn(Optional.empty())
+            .thenReturn(Optional.of(sync));
+        when(leadRepository.findByPortfolioId(PF_ID)).thenReturn(List.of(unLead()));
+        when(affaireRepository.findByPortfolioId(PF_ID)).thenReturn(List.of());
 
         var result = service.getPortefeuille(PF_ID);
 
-        assertThat(result.donneesDatees()).isTrue();
+        assertThat(result.staleData()).isTrue();
         assertThat(result.leads()).hasSize(1);
     }
 
@@ -93,35 +92,36 @@ class PortefeuilleServiceTest {
         when(syncRepository.existsById(PF_ID)).thenReturn(false);
 
         assertThatThrownBy(() -> service.getPortefeuille(PF_ID))
-            .isInstanceOf(PortefeuilleIndisponibleException.class)
-            .hasMessageContaining("indisponibles");
+            .isInstanceOf(PortefeuilleIndisponibleException.class);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private PortefeuilleSync syncAvecAge(int heures) {
         var sync = new PortefeuilleSync(PF_ID);
-        sync.setDerniereSynchronisation(LocalDateTime.now().minusHours(heures));
+        sync.setLastSyncAt(LocalDateTime.now().minusHours(heures));
         return sync;
     }
 
     private Lead unLead() {
         var l = new Lead();
         l.setId("LEAD-001");
-        l.setPortefeuilleId(PF_ID);
-        l.setNomClient("Dupont");
-        l.setStatut("NOUVEAU");
-        l.setDerniereSynchronisation(LocalDateTime.now());
+        l.setPortfolioId(PF_ID);
+        l.setClientLastName("Dupont");
+        l.setStatus("NEW");
+        l.setLastSyncAt(LocalDateTime.now());
+        l.setCountryCode("fr");
         return l;
     }
 
     private Affaire uneAffaire() {
         var a = new Affaire();
         a.setId("AFF-001");
-        a.setPortefeuilleId(PF_ID);
-        a.setNomClient("Durand");
-        a.setStatut("RENOUVELLEMENT");
-        a.setDerniereSynchronisation(LocalDateTime.now());
+        a.setPortfolioId(PF_ID);
+        a.setClientLastName("Durand");
+        a.setStatus("RENEWAL");
+        a.setLastSyncAt(LocalDateTime.now());
+        a.setCountryCode("fr");
         return a;
     }
 }

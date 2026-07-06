@@ -19,6 +19,6 @@ public class PortefeuilleController {
     @GetMapping
     public ResponseEntity<PortefeuilleResponse> getPortefeuille() {
         var vendeur = JwtAuthenticationConverter.currentVendeur();
-        return ResponseEntity.ok(portefeuilleService.getPortefeuille(vendeur.portefeuilleId()));
+        return ResponseEntity.ok(portefeuilleService.getPortefeuille(vendeur.portfolioId()));
     }
 }

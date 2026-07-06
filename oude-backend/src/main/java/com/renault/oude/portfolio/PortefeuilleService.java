@@ -2,6 +2,7 @@ package com.renault.oude.portfolio;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +14,9 @@ import java.util.List;
 public class PortefeuilleService {
 
     private static final Logger log = LoggerFactory.getLogger(PortefeuilleService.class);
-    private static final long CACHE_TTL_HOURS = 1;
+
+    @Value("${oude.cache.portfolio-ttl-hours:1}")
+    private long cacheTtlHours;
 
     private final LeadRepository leadRepository;
     private final AffaireRepository affaireRepository;
@@ -31,74 +34,74 @@ public class PortefeuilleService {
     }
 
     @Transactional
-    public PortefeuilleResponse getPortefeuille(String portefeuilleId) {
-        var sync = syncRepository.findById(portefeuilleId);
-        boolean cacheValide = sync.isPresent()
-            && ChronoUnit.HOURS.between(sync.get().getDerniereSynchronisation(), LocalDateTime.now()) < CACHE_TTL_HOURS;
+    public PortefeuilleResponse getPortefeuille(String portfolioId) {
+        var sync = syncRepository.findById(portfolioId);
+        boolean cacheValid = sync.isPresent()
+            && ChronoUnit.HOURS.between(sync.get().getLastSyncAt(), LocalDateTime.now()) < cacheTtlHours;
 
-        if (cacheValide) {
-            log.info("portefeuille_source=cache portefeuille_id={}", portefeuilleId);
-            return fromCache(portefeuilleId, false);
+        if (cacheValid) {
+            log.info("portefeuille_source=cache portfolio_id={}", portfolioId);
+            return fromCache(portfolioId, false);
         }
 
         try {
-            return refreshFromApi(portefeuilleId);
+            return refreshFromApi(portfolioId);
         } catch (Exception ex) {
-            log.warn("renault_api_fallback portefeuille_id={} reason={}", portefeuilleId, ex.getMessage());
-            if (syncRepository.existsById(portefeuilleId)) {
-                return fromCache(portefeuilleId, true);
+            log.warn("renault_api_fallback portfolio_id={} reason={}", portfolioId, ex.getMessage());
+            if (syncRepository.existsById(portfolioId)) {
+                return fromCache(portfolioId, true);
             }
-            throw new PortefeuilleIndisponibleException("Données Renault temporairement indisponibles");
+            throw new PortefeuilleIndisponibleException("portfolio.unavailable");
         }
     }
 
-    private PortefeuilleResponse refreshFromApi(String portefeuilleId) {
+    private PortefeuilleResponse refreshFromApi(String portfolioId) {
         long start = System.currentTimeMillis();
-        List<Lead> leads = renaultApiClient.fetchLeads(portefeuilleId);
-        List<Affaire> affaires = renaultApiClient.fetchAffaires(portefeuilleId);
+        List<Lead> leads = renaultApiClient.fetchLeads(portfolioId);
+        List<Affaire> affaires = renaultApiClient.fetchAffaires(portfolioId);
 
-        upsertLeads(portefeuilleId, leads);
-        upsertAffaires(portefeuilleId, affaires);
-        upsertSync(portefeuilleId, "api");
+        upsertLeads(portfolioId, leads);
+        upsertAffaires(portfolioId, affaires);
+        upsertSync(portfolioId, "api");
 
-        log.info("portefeuille_source=api portefeuille_id={} latency_ms={}", portefeuilleId, System.currentTimeMillis() - start);
+        log.info("portefeuille_source=api portfolio_id={} latency_ms={}", portfolioId, System.currentTimeMillis() - start);
         return new PortefeuilleResponse(leads, affaires, false, LocalDateTime.now());
     }
 
-    private PortefeuilleResponse fromCache(String portefeuilleId, boolean donneesDatees) {
-        var sync = syncRepository.findById(portefeuilleId).orElseThrow();
+    private PortefeuilleResponse fromCache(String portfolioId, boolean staleData) {
+        var sync = syncRepository.findById(portfolioId).orElseThrow();
         return new PortefeuilleResponse(
-            leadRepository.findByPortefeuilleId(portefeuilleId),
-            affaireRepository.findByPortefeuilleId(portefeuilleId),
-            donneesDatees,
-            sync.getDerniereSynchronisation()
+            leadRepository.findByPortfolioId(portfolioId),
+            affaireRepository.findByPortfolioId(portfolioId),
+            staleData,
+            sync.getLastSyncAt()
         );
     }
 
-    private void upsertLeads(String portefeuilleId, List<Lead> leads) {
-        leadRepository.deleteByPortefeuilleId(portefeuilleId);
+    private void upsertLeads(String portfolioId, List<Lead> leads) {
+        leadRepository.deleteByPortfolioId(portfolioId);
         var now = LocalDateTime.now();
         leads.forEach(l -> {
-            l.setPortefeuilleId(portefeuilleId);
-            l.setDerniereSynchronisation(now);
+            l.setPortfolioId(portfolioId);
+            l.setLastSyncAt(now);
         });
         leadRepository.saveAll(leads);
     }
 
-    private void upsertAffaires(String portefeuilleId, List<Affaire> affaires) {
-        affaireRepository.deleteByPortefeuilleId(portefeuilleId);
+    private void upsertAffaires(String portfolioId, List<Affaire> affaires) {
+        affaireRepository.deleteByPortfolioId(portfolioId);
         var now = LocalDateTime.now();
         affaires.forEach(a -> {
-            a.setPortefeuilleId(portefeuilleId);
-            a.setDerniereSynchronisation(now);
+            a.setPortfolioId(portfolioId);
+            a.setLastSyncAt(now);
         });
         affaireRepository.saveAll(affaires);
     }
 
-    private void upsertSync(String portefeuilleId, String source) {
-        var sync = syncRepository.findById(portefeuilleId)
-            .orElse(new PortefeuilleSync(portefeuilleId));
-        sync.setDerniereSynchronisation(LocalDateTime.now());
+    private void upsertSync(String portfolioId, String source) {
+        var sync = syncRepository.findById(portfolioId)
+            .orElse(new PortefeuilleSync(portfolioId));
+        sync.setLastSyncAt(LocalDateTime.now());
         sync.setSource(source);
         syncRepository.save(sync);
     }

@@ -53,6 +53,8 @@ development_status:
   1-1-bootstrap-projet-angular-spring-boot-postgresql-gke: in-progress  # SCRUM-11
   1-2-integration-sso-renault-authentification-et-extraction-identite: review  # SCRUM-12
   1-3-navigation-shell-layout-principal-et-routing-angular: backlog       # SCRUM-13
+  1-4-couche-configuration-pays-multi-country-config-layer: ready-for-dev # SCRUM-34 (à créer JIRA)
+  1-5-internationalisation-i18n-ngx-translate-messagesource: ready-for-dev # SCRUM-35 (à créer JIRA)
   epic-1-retrospective: optional
 
   # ── Epic 2 : Homepage — vue portefeuille du vendeur ─────────────────────── SCRUM-6

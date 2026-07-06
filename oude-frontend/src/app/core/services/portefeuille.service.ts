@@ -1,5 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { TranslateService } from '@ngx-translate/core';
 import { PortefeuilleResponse, Lead, Affaire } from '../models/portefeuille.model';
 
 @Injectable({ providedIn: 'root' })
@@ -11,11 +12,11 @@ export class PortefeuilleService {
   readonly portefeuille = this._portefeuille.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
-  readonly donneesDatees = computed(() => this._portefeuille()?.donneesDatees ?? false);
+  readonly staleData = computed(() => this._portefeuille()?.staleData ?? false);
   readonly leads = computed(() => this._portefeuille()?.leads ?? []);
   readonly affaires = computed(() => this._portefeuille()?.affaires ?? []);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private translate: TranslateService) {}
 
   load(): void {
     this._loading.set(true);
@@ -28,11 +29,8 @@ export class PortefeuilleService {
       },
       error: (err) => {
         this._loading.set(false);
-        this._error.set(
-          err.status === 503
-            ? 'Données temporairement indisponibles — affichage du dernier état connu'
-            : 'Erreur lors du chargement du portefeuille'
-        );
+        const key = err.status === 503 ? 'PORTFOLIO.ERROR_STALE' : 'PORTFOLIO.ERROR_LOAD';
+        this._error.set(this.translate.instant(key));
       }
     });
   }

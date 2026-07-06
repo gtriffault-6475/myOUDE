@@ -6,6 +6,6 @@ import java.util.List;
 public record PortefeuilleResponse(
     List<Lead> leads,
     List<Affaire> affaires,
-    boolean donneesDatees,
-    LocalDateTime derniereSynchronisation
+    boolean staleData,
+    LocalDateTime lastSyncAt
 ) {}

@@ -27,7 +27,7 @@ class JwtAuthenticationConverterTest {
         assertThat(identity.vendeurId()).isEqualTo("VEND-001");
         assertThat(identity.prenom()).isEqualTo("Natasha");
         assertThat(identity.email()).isEqualTo("natasha@renault.com");
-        assertThat(identity.portefeuilleId()).isEqualTo("PF-001");
+        assertThat(identity.portfolioId()).isEqualTo("PF-001");
     }
 
     @Test
@@ -59,7 +59,7 @@ class JwtAuthenticationConverterTest {
 
         assertThat(identity.vendeurId()).isEqualTo("VEND-002");
         assertThat(identity.prenom()).isNull();
-        assertThat(identity.portefeuilleId()).isNull();
+        assertThat(identity.portfolioId()).isNull();
     }
 
     private Jwt buildJwt(Map<String, Object> claims) {

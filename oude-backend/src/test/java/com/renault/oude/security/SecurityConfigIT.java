@@ -63,6 +63,6 @@ class SecurityConfigIT {
             .andExpect(jsonPath("$.vendeurId").value("VEND-001"))
             .andExpect(jsonPath("$.prenom").value("Natasha"))
             .andExpect(jsonPath("$.email").value("natasha@renault.com"))
-            .andExpect(jsonPath("$.portefeuilleId").value("PF-001"));
+            .andExpect(jsonPath("$.portfolioId").value("PF-001"));
     }
 }

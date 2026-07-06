@@ -1,34 +1,36 @@
 export interface Lead {
   id: string;
-  portefeuilleId: string;
-  nomClient: string;
-  prenomClient: string;
-  emailClient?: string;
-  telephoneClient?: string;
-  scorePotentiel?: number;
-  statut: string;
-  modeleInteresse?: string;
-  dateCreation?: string;
-  derniereInteraction?: string;
-  derniereSynchronisation: string;
+  portfolioId: string;
+  clientLastName: string;
+  clientFirstName: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  potentialScore?: number;
+  status: string;
+  vehicleModel?: string;
+  createdAt?: string;
+  lastInteractionAt?: string;
+  lastSyncAt: string;
+  countryCode: string;
 }
 
 export interface Affaire {
   id: string;
-  portefeuilleId: string;
-  nomClient: string;
-  prenomClient: string;
-  modele?: string;
-  typeFinancement?: string;
-  statut: string;
-  dateCreation?: string;
-  echeance?: string;
-  derniereSynchronisation: string;
+  portfolioId: string;
+  clientLastName: string;
+  clientFirstName: string;
+  vehicleModel?: string;
+  financingType?: string;
+  status: string;
+  createdAt?: string;
+  dueAt?: string;
+  lastSyncAt: string;
+  countryCode: string;
 }
 
 export interface PortefeuilleResponse {
   leads: Lead[];
   affaires: Affaire[];
-  donneesDatees: boolean;
-  derniereSynchronisation: string;
+  staleData: boolean;
+  lastSyncAt: string;
 }
